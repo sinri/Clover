@@ -128,8 +128,11 @@ class Clover
 		Clover::$root_path=$path;
 	}
 
-	public static function start(){
+	public static function start($root_path=null){
 		try {
+			if($root_path!==null){
+				Clover::setRootPath($root_path);
+			}
 			$controller_name=Clover::getController($sub_paths);
 			if(empty($controller_name)){
 				$controller_name=Clover::$default_controller_name;
