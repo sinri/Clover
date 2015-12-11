@@ -1,4 +1,5 @@
 # Clover
+
 An MVC Framework for Restful Web Project in PHP, under MIT License, now version 0.1.
 
 ## Introduction
@@ -16,6 +17,8 @@ For `GET` request, Clover would parse the query string. For `POST`, Clover accep
 Clover is based on rewrite modual of Apache. (Nginx is also supported, in theory.) Create and edit `.htaccess` file in the root directory with the following:
 
 	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule ^(.*)$ index.php [QSA,L]
 	# For Apache2
 

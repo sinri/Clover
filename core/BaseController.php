@@ -14,6 +14,6 @@ class BaseController
 	}
 
 	public function index(){
-		echo "This controller is under construction.";
+		Clover::display('CloverIndex.htm');
 	}
 }
