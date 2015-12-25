@@ -44,7 +44,7 @@ Finally, start Clover:
 
 ### Controller
 
-Create an php file with a class inside. File name should be the same with the class inside. The class should extend class `BaseController`.
+Create an php file with a class inside. File name should be the same with the class inside. The class should extend class `CloverController`.
 
 The methods of the class would be the method of the controller and `index` would be the default. The third element and the next ones of the url, if exist, would be the parameters of the method.
 

@@ -5,7 +5,7 @@
 * Under MIT License
 * Version 0.1 Updated on Dec 11 2015
 */
-class BaseController
+class CloverController
 {
 	
 	function __construct()

@@ -5,7 +5,7 @@
 * Under MIT License
 * Version 0.1 Updated on Dec 11 2015
 */
-class CloverInfoTest extends BaseController
+class CloverInfoTest extends CloverController
 {
 	
 	function __construct()
@@ -27,8 +27,16 @@ class CloverInfoTest extends BaseController
 		Clover::display('CloverInfoTest.htm',$assignment);
 	}
 
-	function sample($v1='d1',$v2='d2'){
-		echo "this is CloverInfoTest->sample([$v1],[$v2])";
+	function sample0($v1='d1',$v2='d2'){
+		echo "this is CloverInfoTest->sample0([$v1],[$v2])";
+	}
+
+	function sample1(){
+		var_dump( Clover::getStore('A') );
+
+		Clover::setStore('A','aaa');
+
+		var_dump( Clover::getStore('A') );
 	}
 }
 ?>

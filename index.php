@@ -7,6 +7,8 @@
 */
 require __DIR__.'/core/Clover.php';
 
+date_default_timezone_set("Asia/Shanghai");
+
 Clover::setRootPath(__DIR__);
 Clover::start();
 

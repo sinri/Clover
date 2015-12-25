@@ -9,14 +9,22 @@ class Clover
 {
 	static $root_path='/';
 
-	static $default_controller_name='BaseController';
+	static $default_controller_name='CloverController';
 
 	static $controller_dir='controller';
 	static $model_dir='model';
 	static $view_dir='view';
 
+	static $log_dir='/var/log/Clover';
+
 	static $error_view_file='error.htm';
 	static $code_404_view_file='page_not_found.htm';
+
+	static $current_task_uuid='';
+
+	static $logger=null;
+
+	static $storage=array();
 	
 	function __construct()
 	{
@@ -128,8 +136,42 @@ class Clover
 		Clover::$root_path=$path;
 	}
 
+	public static function getLogger(){
+		if(!Clover::$logger){
+			$instance=new CloverLogger();
+			$instance->setLogDir(Clover::$log_dir);
+			Clover::$logger=$instance;
+		}
+		return Clover::$logger;
+	}
+
+	private static function LogRequest(){
+		$request_uri=Clover::getServer('REQUEST_URI');
+		$query=Clover::getQuery();
+		$data=Clover::getData();
+		Clover::getLogger()->log("[REQUEST] #".Clover::$current_task_uuid." ".json_encode(array('request_uri'=>$request_uri,'query'=>$query,'data'=>$data)));
+	}
+
+	public static function getStore($name,$default=null){
+		$store=Clover::$storage;
+		if(isset($store[$name])){
+			return $store[$name];
+		}else{
+			return $default;
+		}
+	}
+
+	public static function setStore($name,$value){
+		Clover::$storage[$name]=$value;
+	}
+
+	// INPUT and OUTPUT
+
 	public static function start($root_path=null){
 		try {
+			Clover::$current_task_uuid=uniqid();
+			Clover::LogRequest();
+
 			if($root_path!==null){
 				Clover::setRootPath($root_path);
 			}
@@ -137,13 +179,9 @@ class Clover
 			if(empty($controller_name)){
 				$controller_name=Clover::$default_controller_name;
 			}
-			// $class_php_file=Clover::$root_path.Clover::$controller_dir.DIRECTORY_SEPARATOR.$controller_name.".php";
-			// if(file_exists($class_php_file)){
-			// 	require_once($class_php_file);
-			// }
 			if(class_exists($controller_name)){
 				$controller=new $controller_name();
-				if(!is_a($controller, 'BaseController')){
+				if(!is_a($controller, 'CloverController')){
 					throw new Exception($controller_name, -404);
 				}
 			}else{
@@ -183,10 +221,24 @@ class Clover
 		include Clover::$root_path.Clover::$view_dir.DIRECTORY_SEPARATOR.$view_file;
 		if(!$isPart)exit();
 	}
+
+	public static function displayWithJSON($json_object,$code=200,$error=''){
+		header('Content-type: application/json');
+		$json=array(
+			'code'=>$code,
+			'result'=>$json_object,
+			'error'=>$error,
+		);
+		$result=json_encode($json);
+		echo $result;
+		Clover::getLogger()->log("[RESPONSE] #".Clover::$current_task_uuid." ".$result);
+		exit();
+	}
 }
 
 
 function __autoload($classname) {
+	/*
 	//Zero, seek core
 	$filename = __DIR__.DIRECTORY_SEPARATOR.$classname.".php";
 	if(file_exists($filename)){
@@ -206,5 +258,32 @@ function __autoload($classname) {
 	if(file_exists($filename)){
 		include_once($filename);
 		return;
+	}
+	*/
+
+	$stack=array(
+		Clover::$root_path.Clover::$model_dir,
+		Clover::$root_path.Clover::$controller_dir,
+		__DIR__
+	);
+	// echo "stack init<br>\n";
+	while(!empty($stack)){
+		$dir=array_pop($stack);
+		// echo "pop ".$dir."<br>\n";
+
+		if(file_exists($dir.DIRECTORY_SEPARATOR.$classname.".php")){
+			include_once($dir.DIRECTORY_SEPARATOR.$classname.".php");
+			return;
+		}
+
+		if ($handle = opendir($dir)) {
+		    while (false !== ($file = readdir($handle))) {
+		        if($file!='.' && $file!='..' && is_dir($dir.DIRECTORY_SEPARATOR.$file)){
+		        	array_push($stack, $dir.DIRECTORY_SEPARATOR.$file);
+		        	// echo "push ".$dir.DIRECTORY_SEPARATOR.$file."<br>\n";
+		        }
+		    }
+		    closedir($handle);
+		}
 	}
 }

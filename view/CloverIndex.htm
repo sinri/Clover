@@ -17,6 +17,7 @@
 			width: 40px;
 			height: 40px;
 			display: inline-block;
+			margin: 20px 10px;
 		}
 		.header-div h1 {
 			font-family: 'Estrangelo Edessa',serif;
@@ -60,26 +61,39 @@
 			background-color: #5555CC;
 			color: white;
 		}
+		a.btn {
+			border: 1px solid gray;
+			padding: 6px;
+			margin: 4px;
+			border-radius: 5px;
+			background-color: #5555CC;
+			color: white;
+			display: inline-block;
+		}
 		</style>
 	</head>
 	<body>
 		<div class="header-div">
-			<img src="assets/clover_icon.png">
-			<h1>Clover
-				<small>
-					&nbsp;&nbsp;
-					<a href="https://github.com/sinri/Clover"><span class="btn">View project on GitHub</span></a>
-					&nbsp;&nbsp;
-					<a href="https://github.com/sinri/Clover.git"><span class="btn">Git source codes from GitHub</span></a>
-				</small>
-			</h1>
+			<div style="float:left">
+				<img src="assets/clover_icon.png">
+			</div>
+			<div style="float:left">
+				<h1>Clover</h1>
+			</div>
+			<div style="float:right;margin:20px 10px;">
+				<a href="https://github.com/sinri/Clover" class="btn">View project on GitHub</a>
+				<a href="https://github.com/sinri/Clover.git" class="btn">Git source codes from GitHub</a>
+			</div>
+			<div style="clear:both"></div>
 		</div>
 		<hr>
 		<div class="info-div">
 			<p>
 				An MVC Framework for Restful Web Project in PHP, under MIT License.
 			</p>
-			
+			<p>
+				Just have a try! Good luck!
+			</p>
 		</div>
 		<hr>
 		<div class="copyright-info-div">
