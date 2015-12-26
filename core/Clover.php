@@ -3,7 +3,7 @@
 * Clover Core Class
 * Copyright 2015 EJSE
 * Under MIT License
-* Version 0.1 Updated on Dec 11 2015
+* Version 0.2 Updated on Dec 26 2015
 */
 class Clover
 {
@@ -11,6 +11,7 @@ class Clover
 
 	static $default_controller_name='CloverController';
 
+	static $command_dir='command';
 	static $controller_dir='controller';
 	static $model_dir='model';
 	static $view_dir='view';
@@ -26,13 +27,6 @@ class Clover
 
 	static $storage=array();
 	
-	function __construct()
-	{
-		# code...
-	}
-
-	// TOOLKIT
-
 	public static function getQuery($name=null,$default=null){
 		if($name===null){
 			return $_GET;
@@ -112,21 +106,35 @@ class Clover
 	}
 
 	public static function getController(&$sub_paths=array()){
-		$controllerIndex = Clover::getControllerIndex();
-		$pattern = '/^\/([^\?]*)(\?|$)/';
-		$r=preg_match($pattern, $controllerIndex, $matches);
-		$controller_array=explode('/', $matches[1]);
-		if(count($controller_array)>0){
-			$controller_name=$controller_array[0];
-			if(count($controller_array)>1){
-				unset($controller_array[0]);
-				$sub_paths=array_values($controller_array);
+		global $argv;
+		global $argc;
+
+		$controller_name='';
+
+		if(Clover::is_cli()){
+			$sub_paths=array();
+			for ($i=1; $i < $argc; $i++) { 
+				if($i==1){
+					$controller_name=$argv[$i];
+				}else{
+					$sub_paths[]=$argv[$i];
+				}
+			}
+		}else{
+			$controllerIndex = Clover::getControllerIndex();
+			$pattern = '/^\/([^\?]*)(\?|$)/';
+			$r=preg_match($pattern, $controllerIndex, $matches);
+			$controller_array=explode('/', $matches[1]);
+			if(count($controller_array)>0){
+				$controller_name=$controller_array[0];
+				if(count($controller_array)>1){
+					unset($controller_array[0]);
+					$sub_paths=array_values($controller_array);
+				}
 			}
 		}
 		return $controller_name;
 	}
-
-	// EXECUTE
 
 	public static function setRootPath($path){
 		$last_char=substr($path, -1);
@@ -143,6 +151,14 @@ class Clover
 			Clover::$logger=$instance;
 		}
 		return Clover::$logger;
+	}
+
+	private static function LogCommand(){
+		global $argv;
+		global $argc;
+
+		$cmd=implode(' ', $argv);
+		Clover::getLogger()->log("[COMMAND] #".Clover::$current_task_uuid." ".$cmd);
 	}
 
 	private static function LogRequest(){
@@ -165,9 +181,93 @@ class Clover
 		Clover::$storage[$name]=$value;
 	}
 
-	// INPUT and OUTPUT
+	public static function is_cli() {
+    	return (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)));
+	}
 
 	public static function start($root_path=null){
+		if(Clover::is_cli()){
+			Clover::startForCLI($root_path);
+		}else{
+			Clover::startForWebRequest($root_path);
+		}
+	}
+
+	public static function startForCLI($root_path=null){
+		global $argv;
+		global $argc;
+		try {
+			Clover::$current_task_uuid=uniqid();
+			Clover::LogCommand();
+
+			if($root_path!==null){
+				Clover::setRootPath($root_path);
+			}
+			$controller_name=Clover::getController($sub_paths);
+			if(empty($controller_name)){
+				$controller_name=Clover::$default_controller_name;
+			}
+
+			if(class_exists($controller_name)){
+				$controller=new $controller_name();
+				if(!is_a($controller, 'CloverCommand')){
+					throw new Exception($controller_name, -404);
+				}
+			}else{
+				throw new Exception($controller_name, -404);				
+			}
+
+			$parameter_list=array();
+			if(!empty($sub_paths)){
+				$action=$sub_paths[0].'Action';
+				if(method_exists($controller, $action)){
+					unset($sub_paths[0]);
+					
+					//some test
+					
+					$reflect = new ReflectionMethod($controller_name,$action);
+					foreach($reflect->getParameters() as $param) {  
+						$param_name=$param->getName();
+
+						// set default values
+					    if($param->isDefaultValueAvailable() && $param->isDefaultValueConstant()) {
+					        $parameter_list[$param_name]=$param->getDefaultValueConstantName();
+					    }else{
+					    	$parameter_list[$param_name]="";
+					    }
+					}
+					
+					foreach ($sub_paths as $item) {
+						$eq_index=strpos($item, '=');
+						if($eq_index!==false){
+							$p_name=substr($item, 2,$eq_index-2);
+							$p_value=substr($item, $eq_index+1);
+							if(isset($parameter_list[$p_name])){
+								$parameter_list[$p_name]=$p_value;
+							}
+						}
+					}
+				}else{
+					throw new Exception($controller_name."->".$action, -404);
+				}
+			}else{
+				$action='defaultAction';
+			}
+
+			call_user_func_array(array($controller,'beforeExecute'), array($controller_name,$action,$parameter_list));
+			call_user_func_array(array($controller,$action), $parameter_list);
+			call_user_func_array(array($controller,'afterExecute'), array($controller_name,$action,$parameter_list));
+		} catch (Exception $e) {
+			if($e->getCode()==-404){
+				//Command and action Not Found
+				echo "Command and action missing: ".$e->getMessage().PHP_EOL;
+			}else{
+				echo "Clover Command Error: ".$e->getMessage().PHP_EOL;
+			}
+		}
+	}
+
+	public static function startForWebRequest($root_path=null){
 		try {
 			Clover::$current_task_uuid=uniqid();
 			Clover::LogRequest();
@@ -191,7 +291,7 @@ class Clover
 				$func_name=$sub_paths[0];
 				if(method_exists($controller, $func_name)){
 					unset($sub_paths[0]);
-					call_user_func_array(array($controller_name,$func_name), array_values($sub_paths));
+					call_user_func_array(array($controller,$func_name), array_values($sub_paths));
 				}else{
 					throw new Exception($controller_name."->".$func_name, -404);
 				}
@@ -238,38 +338,14 @@ class Clover
 
 
 function __autoload($classname) {
-	/*
-	//Zero, seek core
-	$filename = __DIR__.DIRECTORY_SEPARATOR.$classname.".php";
-	if(file_exists($filename)){
-		include_once($filename);
-		return;
-	}
-
-	// First, seek controller
-	$filename = Clover::$root_path.Clover::$controller_dir.DIRECTORY_SEPARATOR.$classname.".php";
-	if(file_exists($filename)){
-		include_once($filename);
-		return;
-	}
-
-	//Second, seek model
-	$filename = Clover::$root_path.Clover::$model_dir.DIRECTORY_SEPARATOR.$classname.".php";
-	if(file_exists($filename)){
-		include_once($filename);
-		return;
-	}
-	*/
-
 	$stack=array(
+		Clover::$root_path.Clover::$command_dir,
 		Clover::$root_path.Clover::$model_dir,
 		Clover::$root_path.Clover::$controller_dir,
 		__DIR__
 	);
-	// echo "stack init<br>\n";
 	while(!empty($stack)){
 		$dir=array_pop($stack);
-		// echo "pop ".$dir."<br>\n";
 
 		if(file_exists($dir.DIRECTORY_SEPARATOR.$classname.".php")){
 			include_once($dir.DIRECTORY_SEPARATOR.$classname.".php");
@@ -280,7 +356,6 @@ function __autoload($classname) {
 		    while (false !== ($file = readdir($handle))) {
 		        if($file!='.' && $file!='..' && is_dir($dir.DIRECTORY_SEPARATOR.$file)){
 		        	array_push($stack, $dir.DIRECTORY_SEPARATOR.$file);
-		        	// echo "push ".$dir.DIRECTORY_SEPARATOR.$file."<br>\n";
 		        }
 		    }
 		    closedir($handle);

@@ -1,9 +1,9 @@
 <?php
 /**
-* Clover Core Class
+* Clover Core Class For Web Request
 * Copyright 2015 EJSE
 * Under MIT License
-* Version 0.1 Updated on Dec 11 2015
+* Version 0.2 Updated on Dec 26 2015
 */
 class CloverController
 {

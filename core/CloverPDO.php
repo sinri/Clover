@@ -1,14 +1,11 @@
 <?php
 /*
  * Sinri Database Toolkit
+ * Make the use of PDO easier
  * =========================
  * The toolkit for database
  * Sinri Edogawa 2015-09-24
  */
-
-/**
-* Make the use of PDO easier
-*/
 class CloverPDO
 {
 	private $pdo=null;

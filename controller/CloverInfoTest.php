@@ -1,9 +1,9 @@
 <?php
 /**
-* Clover Core Class
+* Clover Sample Class For Web Request
 * Copyright 2015 EJSE
 * Under MIT License
-* Version 0.1 Updated on Dec 11 2015
+* Version 0.2 Updated on Dec 26 2015
 */
 class CloverInfoTest extends CloverController
 {
@@ -13,6 +13,10 @@ class CloverInfoTest extends CloverController
 		# code...
 	}
 
+	/**
+	 * It is routed as CLOVER_ROOT/CloverInfoTest
+	 * It displays request information
+	 */
 	function index(){
 		$assignment=array(
 			'title'=>'INDEX',
@@ -27,10 +31,18 @@ class CloverInfoTest extends CloverController
 		Clover::display('CloverInfoTest.htm',$assignment);
 	}
 
-	function sample0($v1='d1',$v2='d2'){
-		echo "this is CloverInfoTest->sample0([$v1],[$v2])";
+	/**
+	 * It is routed as CLOVER_ROOT/CloverInfoTest/sample0(/v1(/v2))
+	 * It shows the controller and options with correct route
+	 */
+	function sample0($v1='default_value_1',$v2='default_value_2'){
+		echo "This is CloverInfoTest->sample0([$v1],[$v2])";
 	}
 
+	/**
+	 * It is routed as CLOVER_ROOT/CloverInfoTest/sample2
+	 * It shows the usage of Clover Storage
+	 */
 	function sample1(){
 		var_dump( Clover::getStore('A') );
 

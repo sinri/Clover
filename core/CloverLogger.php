@@ -1,7 +1,10 @@
 <?php
 /**
-
- */
+* Clover Core Class For Logging
+* Copyright 2015 EJSE, Advanced based on Leqee ERP
+* Under MIT License
+* Version 0.2 Updated on Dec 26 2015
+*/
 class CloverLogger
 {
     static $log_dir='log';

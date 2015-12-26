@@ -1,6 +1,6 @@
 <?php
 /**
-* Clover Core Class For Web Request Executing
+* Clover Core Class For CLI Executing
 * Copyright 2015 EJSE
 * Under MIT License
 * Version 0.1 Updated on Dec 11 2015

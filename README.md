@@ -1,6 +1,6 @@
 # Clover
 
-An MVC Framework for Restful Web Project in PHP, under MIT License, now version 0.1.
+An MVC Framework for Restful Web Project in PHP, under MIT License, now version 0.2.
 
 ## Introduction
 
@@ -24,9 +24,11 @@ Clover is based on rewrite modual of Apache. (Nginx is also supported, in theory
 
 ## Usage
 
-Just fill the controller classes in `controller` directory, model classes in `model` directory, and view html files in `view` directory.
+Clover supports processing web requests. As well, Clover could be used in CLI mode since version 0.2, as Yii Framework supports.
 
-Import Clover file into `index.php`:
+Just fill the controller classes in `controller` directory, model classes in `model` directory, and view html files in `view` directory. For command line use, fill commands in `command` directory.
+
+Import Clover file into `index.php` for web request, or `CloverCLI.php` for CLI:
 
 	require __DIR__.'/core/Clover.php';
 
@@ -58,6 +60,14 @@ You can define model class in model directory in the php file with same name, wh
 ### View
 
 For view, create html file in view directory. Within the html content, you can use PHP codes inside, as well as the assigned parameters.
+
+### Command
+
+Create an php file with a class inside. File name should be the same with the class inside. The class should extend class `CloverCommand`.
+
+The methods of the class which named as `.+Action` would be treated as action to execute, and default as `defaultAction`. For parameter usage, use `--PARAM_NAME=PARAM_VALUE`.
+
+You can override `beforeAction` and `afterAction` functions to realize the action procedure control.
 
 ## Clover Class Toolkits
 
