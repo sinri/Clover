@@ -90,12 +90,61 @@
 		</div>
 		<hr>
 		<div class="info-div">
-			<p>
-				An MVC Framework for Restful Web Project in PHP, under MIT License.
-			</p>
-			<p>
-				Just have a try! Good luck!
-			</p>
+			<div id="menu_div">
+				<p>
+					An MVC Framework for Restful Web Project in PHP, under MIT License.
+				</p>
+				<p>
+					Just have a try! Good luck!
+				</p>
+				<h3>Menu</h3>
+				<p>
+					<a href="#install_div">1. Install</a>
+				</p>
+				<p>
+					<a href="#start_web_div">2. Startup for Web Request</a>
+				</p>
+				<p>
+					<a href="#start_cli_div">3. Startup for CLI</a>
+				</p>
+			</div>
+			<div id="install_div">
+				<h3>Install</h3>
+				<p>
+					Clover is easy to install. Just download the toolkit codes and configure the interface page. Then add the Rewrite Code to the file <code>.htaccess</code>.
+				</p>
+				<pre>
+	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ index.php [QSA,L]
+	# For Apache2
+				</pre>
+			</div>
+			<div id="start_web_div">
+				<h3>Startup for Web Request</h3>
+				<p>
+					For web request, you need to generate the controllers, models and views in certain directories, which are defined in the Clover Class and could be changed dynamically.
+				</p>
+				<p>
+					Then you can open your browser to link to your site with url. The url rules are as following. The part of <code>index.php</code> might be neglected.
+				</p>
+				<pre>
+	WEB_ROOT/CONTROLLER(/ACTION(/PARAM))
+				</pre>
+			</div>
+			<div id="start_cli_div">
+				<h3>Startup for CLI</h3>
+				<p>
+					For CLI (designed for cronjob), the models and views are same to web request, but no controllers needed, instead commands are required.
+				</p>
+				<p>
+					Run script command as following.
+				</p>
+				<pre>
+	php CloverCLI.php COMMAND ACTION --PARAM_NAME=PARAM_VALUE
+				</pre>
+			</div>
 		</div>
 		<hr>
 		<div class="copyright-info-div">
