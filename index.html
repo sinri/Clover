@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Clover by sinri</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Clover</h1>
+      <h2 class="project-tagline">An MVC Framework for Restful Web Project in PHP</h2>
+      <a href="https://github.com/sinri/Clover" class="btn">View on GitHub</a>
+      <a href="https://github.com/sinri/Clover/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/sinri/Clover/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="clover" class="anchor" href="#clover" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clover</h1>
+
+<p>An MVC Framework for Restful Web Project in PHP, under MIT License, now version 0.2.</p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Clover is designed after CodeIgniter but much more simpler. It provides Restful style HTTP request process resolution.</p>
+
+<p>Clover uses Model-View-Controller (MVC) architecture. Clover would parse all requests to controller, method and its parameters, and call the very method of controller with those parameters to response.</p>
+
+<p>In short, URL <code>clover.ng/CONTROLLER/METHOD/Param1/Param2</code> would be processed by <code>CONTROLLER()-&gt;METHOD(Param1,Param2)</code>. Of course, URL <code>clover.ng/CONTROLLER/METHOD/Param1</code>, <code>clover.ng/CONTROLLER/METHOD</code>, and <code>clover.ng/CONTROLLER</code> are also available if controller was designed to support.</p>
+
+<p>For <code>GET</code> request, Clover would parse the query string. For <code>POST</code>, Clover accept encoded url data and form data format by default, and also request with JSON data as HTTP request body when declare <code>application/json</code> as the value of Header <code>Content-Type</code>.</p>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Clover is based on rewrite modual of Apache. (Nginx is also supported, in theory.) Create and edit <code>.htaccess</code> file in the root directory with the following:</p>
+
+<pre><code>RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+# For Apache2
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Clover supports processing web requests. As well, Clover could be used in CLI mode since version 0.2, as Yii Framework supports.</p>
+
+<p>Just fill the controller classes in <code>controller</code> directory, model classes in <code>model</code> directory, and view html files in <code>view</code> directory. For command line use, fill commands in <code>command</code> directory.</p>
+
+<p>Import Clover file into <code>index.php</code> for web request, or <code>CloverCLI.php</code> for CLI:</p>
+
+<pre><code>require __DIR__.'/core/Clover.php';
+</code></pre>
+
+<p>In <code>index.php</code>, first set the root path:</p>
+
+<pre><code>Clover::setRootPath($path_of_root);
+</code></pre>
+
+<p>For some strange purposes, Clover supports customization on MVC directories, just modify the source code under MIT License.</p>
+
+<p>Finally, start Clover:</p>
+
+<pre><code>Clover::start();
+</code></pre>
+
+<h3>
+<a id="controller" class="anchor" href="#controller" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Controller</h3>
+
+<p>Create an php file with a class inside. File name should be the same with the class inside. The class should extend class <code>CloverController</code>.</p>
+
+<p>The methods of the class would be the method of the controller and <code>index</code> would be the default. The third element and the next ones of the url, if exist, would be the parameters of the method.</p>
+
+<p>Use method <code>display($view_file,$assignment=array(),$isPart=false)</code> to display with certain view. The second parameter is an array to carry the assigned parameters to view. For example, if pass <code>array('K'=&gt;'V')</code> as <code>$assignment</code>, you can use <code>&lt;?php echo $K; ?&gt;</code> to display <code>V</code> in your response view. The third parameter accepts boolean value and FALSE by default to stop PHP script with this very function call. If TRUE were given, the PHP script would run continuely until the end of the code.</p>
+
+<h3>
+<a id="model" class="anchor" href="#model" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Model</h3>
+
+<p>You can define model class in model directory in the php file with same name, which would be loaded automatically when called.</p>
+
+<h3>
+<a id="view" class="anchor" href="#view" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>View</h3>
+
+<p>For view, create html file in view directory. Within the html content, you can use PHP codes inside, as well as the assigned parameters.</p>
+
+<h3>
+<a id="command" class="anchor" href="#command" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Command</h3>
+
+<p>Create an php file with a class inside. File name should be the same with the class inside. The class should extend class <code>CloverCommand</code>.</p>
+
+<p>The methods of the class which named as <code>.+Action</code> would be treated as action to execute, and default as <code>defaultAction</code>. For parameter usage, use <code>--PARAM_NAME=PARAM_VALUE</code>.</p>
+
+<p>You can override <code>beforeAction</code> and <code>afterAction</code> functions to realize the action procedure control.</p>
+
+<h2>
+<a id="clover-class-toolkits" class="anchor" href="#clover-class-toolkits" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clover Class Toolkits</h2>
+
+<p>The following are all static functions of Clover class.</p>
+
+<h3>
+<a id="get-query-method" class="anchor" href="#get-query-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Query Method</h3>
+
+<pre><code>function getQuery($name=null,$default=null)
+</code></pre>
+
+<p>Return the whole <code>$_GET</code> when <code>$name</code> is null. When <code>$name</code> is not null, try to return <code>$_GET[$name]</code> if it is set, or <code>$default</code> would be returned.</p>
+
+<h3>
+<a id="get-raw-http-request-method" class="anchor" href="#get-raw-http-request-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Raw HTTP Request Method</h3>
+
+<pre><code>function getRawRequestBody()
+</code></pre>
+
+<p>Return the raw body of the current HTTP request.</p>
+
+<h3>
+<a id="get-data-method" class="anchor" href="#get-data-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Data Method</h3>
+
+<pre><code>function getData($name=null,$default=null)
+</code></pre>
+
+<p>If request comes in standard HTTP format, return the whole <code>$_POST</code> when <code>$name</code> is null. When <code>$name</code> is not null, try to return <code>$_POST[$name]</code> if it is set, or <code>$default</code> would be returned.</p>
+
+<p>If request comes in JSON Object format and <code>application/json</code> delared in <code>Content-Type</code> header, Clover would parse the HTTP request to JSON Object and get its property with the name given, or return <code>$default</code> when not set.</p>
+
+<h2>
+<a id="ps" class="anchor" href="#ps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>P.S.</h2>
+
+<p>I think that, CI is in good design, but it is too heavy for simple project. I want make an environment to work with free feel, from both requirements and frameworks. In short, I do not want to learn too much about a tool and then trap into the tool. Using Clover, you can get the nearly same result with CI, but you can use all pure PHP function instead of the completely capsulized toolkit of CI. You like extension? Well, just develop them as you like. Clover is only a base framework.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/sinri/Clover">Clover</a> is maintained by <a href="https://github.com/sinri">sinri</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
