@@ -1,0 +1,20 @@
+{
+    "name": "sinri/Clover",
+    "description": "An MVC Framework for Restful Web Project in PHP.",
+    "keywords": ["MVC","Restful"],
+    "homepage": "https://github.com/sinri/Clover",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sinri Edogawa",
+            "email": "e.joshua.s.e@gmail.com",
+            "homepage": "https://github.com/sinri/Clover",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+    }
+}
